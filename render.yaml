@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: dubai-watch
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: DB_DIR
+        value: /tmp/dubai-watch-data

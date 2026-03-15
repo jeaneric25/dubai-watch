@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dubai Watch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:linear-gradient(165deg,#f8f6f1 0%,#eee9df 40%,#e8e2d6 100%);
+  color:#2a2520;
+  -webkit-font-smoothing:antialiased;
+  display:flex;justify-content:center;
+  min-height:100vh;padding:2.5rem 1rem;
+}
+.wrap{width:100%;max-width:840px}
+
+/* Header */
+.title{text-align:center;margin-bottom:1.8rem}
+.title h1{font-size:1.8rem;font-weight:900;letter-spacing:-.04em;color:#1a1714}
+.title h1 span{color:#b8860b}
+.title p{font-size:.72rem;color:#8a7e6e;margin-top:.3rem;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+
+/* Date stamp */
+.datestamp{text-align:center;margin-bottom:1.5rem;font-size:.68rem;color:#a89880;font-weight:500}
+
+/* Gauge */
+.gauge-outer{position:relative;width:100%;max-width:680px;margin:0 auto}
+.gauge-outer svg{width:100%;display:block}
+
+/* Score */
+.score-box{text-align:center;margin-top:.5rem;position:relative;z-index:2}
+.score-num{font-size:3.8rem;font-weight:900;line-height:1;letter-spacing:-.03em}
+.score-of{font-size:.85rem;color:#a89880;font-weight:600}
+.verdict{font-size:1.1rem;font-weight:800;margin-top:.5rem;letter-spacing:.08em;text-transform:uppercase}
+.verdict-sub{font-size:.78rem;color:#8a7e6e;margin-top:.6rem;font-weight:400;font-style:italic;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.65;letter-spacing:.01em;padding:0 1rem}
+.verdict-sub.zone-red{color:#9b3023;background:linear-gradient(135deg,rgba(192,57,43,.06),rgba(192,57,43,.02));border-left:2px solid rgba(192,57,43,.25);padding:.7rem 1.1rem;border-radius:0 8px 8px 0}
+.verdict-sub.zone-amber{color:#8b6914;background:linear-gradient(135deg,rgba(184,134,11,.06),rgba(184,134,11,.02));border-left:2px solid rgba(184,134,11,.25);padding:.7rem 1.1rem;border-radius:0 8px 8px 0}
+.verdict-sub.zone-green{color:#16643a;background:linear-gradient(135deg,rgba(30,132,73,.06),rgba(30,132,73,.02));border-left:2px solid rgba(30,132,73,.25);padding:.7rem 1.1rem;border-radius:0 8px 8px 0}
+
+/* Divider */
+.divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,#c9b99a,transparent);margin:2rem auto}
+
+/* Zone legend */
+.zone-legend{max-width:600px;margin:1.8rem auto 0;display:flex;flex-direction:column;gap:.7rem}
+.zone-legend-item{padding:.9rem 1.1rem;border-radius:12px;border-left:4px solid transparent;transition:all .3s ease;position:relative}
+.zone-legend-item .zl-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.zone-legend-item .zl-badge{font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.zone-legend-item .zl-range{font-size:.65rem;font-weight:600;color:#a89880}
+.zone-legend-item .zl-marker{font-size:.6rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.15rem .45rem;border-radius:4px;margin-left:auto}
+.zone-legend-item .zl-text{font-size:.82rem;line-height:1.7;color:#6b6156}
+
+/* Muted state */
+.zone-legend-item.zl-muted{opacity:.35}
+.zone-legend-item.zl-muted .zl-text{font-size:.75rem;line-height:1.6}
+
+/* Active state */
+.zone-legend-item.zl-active{background:rgba(255,255,255,.6);backdrop-filter:blur(6px);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+
+/* Red */
+.zl-red .zl-badge{color:#c0392b}
+.zl-red.zl-active{border-left-color:#c0392b}
+.zl-red.zl-active .zl-text{color:#7b2318}
+.zl-red.zl-active .zl-marker{background:rgba(192,57,43,.12);color:#c0392b}
+
+/* Amber */
+.zl-amber .zl-badge{color:#b8860b}
+.zl-amber.zl-active{border-left-color:#b8860b}
+.zl-amber.zl-active .zl-text{color:#6b4f08}
+.zl-amber.zl-active .zl-marker{background:rgba(184,134,11,.12);color:#b8860b}
+
+/* Green */
+.zl-green .zl-badge{color:#1e8449}
+.zl-green.zl-active{border-left-color:#1e8449}
+.zl-green.zl-active .zl-text{color:#145a32}
+.zl-green.zl-active .zl-marker{background:rgba(30,132,73,.12);color:#1e8449}
+
+/* Charts */
+.charts-section{margin-top:.5rem}
+.charts-section h2{font-size:.78rem;font-weight:700;color:#8a7e6e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.2rem;text-align:center}
+.charts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem}
+@media(max-width:600px){.charts-grid{grid-template-columns:1fr}}
+.chart-card{
+  background:rgba(255,255,255,.65);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(201,185,154,.3);
+  border-radius:12px;
+  padding:1rem 1.1rem .8rem;
+  box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.02);
+  transition:box-shadow .2s;
+}
+.chart-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.04)}
+.chart-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.15rem}
+.chart-title{font-size:.7rem;font-weight:700;color:#5a4f42}
+.chart-value{font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums}
+.chart-meta{font-size:.6rem;color:#a89880;margin-bottom:.5rem;font-weight:500;display:flex;justify-content:space-between}
+.chart-pct{font-weight:700}
+.chart-svg{width:100%;display:block}
+
+/* Chart hover tooltip */
+.chart-card{position:relative}
+.chart-hover-zone{position:relative;cursor:crosshair}
+.chart-tooltip-line{position:absolute;top:0;bottom:16px;width:1px;background:rgba(90,79,66,.3);pointer-events:none;display:none;z-index:3}
+.chart-tooltip-dot{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;display:none;z-index:4;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.chart-tooltip-box{position:absolute;pointer-events:none;display:none;z-index:5;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);border:1px solid rgba(201,185,154,.4);border-radius:8px;padding:.35rem .55rem;box-shadow:0 4px 12px rgba(0,0,0,.1);white-space:nowrap;transform:translateX(-50%);font-size:.65rem;color:#5a4f42;line-height:1.4}
+.chart-tooltip-box .tt-date{font-weight:600;color:#8a7e6e;font-size:.58rem;letter-spacing:.03em;text-transform:uppercase}
+.chart-tooltip-box .tt-val{font-weight:800;font-size:.78rem;font-variant-numeric:tabular-nums}
+.chart-cumul{font-size:.58rem;color:#8a7e6e;font-weight:600;margin-top:.15rem}
+
+/* Table */
+.breakdown{margin-top:2.2rem;border:1px solid rgba(201,185,154,.3);border-radius:12px;overflow:hidden;background:rgba(255,255,255,.55);backdrop-filter:blur(8px);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.breakdown table{width:100%;border-collapse:collapse;font-size:.73rem}
+.breakdown thead{background:rgba(201,185,154,.15)}
+.breakdown th{padding:.6rem .8rem;text-align:left;font-weight:700;color:#8a7e6e;text-transform:uppercase;letter-spacing:.05em;font-size:.63rem;border-bottom:1px solid rgba(201,185,154,.25)}
+.breakdown th:nth-child(3),.breakdown th:nth-child(4),.breakdown th:nth-child(5){text-align:right}
+.breakdown td{padding:.5rem .8rem;border-bottom:1px solid rgba(201,185,154,.12);color:#4a4238}
+.breakdown td:nth-child(3),.breakdown td:nth-child(4),.breakdown td:nth-child(5){text-align:right;font-variant-numeric:tabular-nums}
+.breakdown tr:last-child td{border-bottom:none}
+.breakdown .score-cell{font-weight:700}
+.sc-high{color:#0e7a3d}
+.sc-mid{color:#b8860b}
+.sc-low{color:#c0392b}
+.breakdown tfoot{background:rgba(201,185,154,.15);font-weight:800}
+.breakdown tfoot td{padding:.65rem .8rem;color:#1a1714;border-top:2px solid rgba(201,185,154,.35)}
+
+/* Suggestion box */
+.suggest-box{max-width:520px;margin:2.2rem auto 0;text-align:center}
+.suggest-label{font-size:.82rem;font-weight:600;color:#5a4f42;margin-bottom:.6rem}
+.suggest-sub{font-size:.7rem;color:#a89880;font-style:italic;margin-bottom:.9rem}
+.suggest-input{width:100%;box-sizing:border-box;border:1px solid rgba(201,185,154,.4);border-radius:10px;padding:.7rem .9rem;font-size:.78rem;font-family:Inter,system-ui,sans-serif;color:#5a4f42;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);resize:vertical;min-height:60px;line-height:1.5;outline:none;transition:border-color .2s,box-shadow .2s}
+.suggest-input:focus{border-color:rgba(168,152,128,.7);box-shadow:0 0 0 3px rgba(168,152,128,.12)}
+.suggest-input::placeholder{color:#c0b8a8;font-style:italic}
+.suggest-btn{margin-top:.6rem;padding:.5rem 1.6rem;border:none;border-radius:8px;background:linear-gradient(135deg,#5a4f42,#8a7e6e);color:#f8f6f1;font-size:.72rem;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:all .2s;font-family:Inter,system-ui,sans-serif}
+.suggest-btn:hover{box-shadow:0 2px 8px rgba(90,79,66,.25);transform:translateY(-1px)}
+.suggest-btn:active{transform:translateY(0)}
+.suggest-thanks{display:none;font-size:.78rem;color:#1e8449;font-weight:600;margin-top:.5rem}
+
+.footer{text-align:center;margin-top:2.5rem;font-size:.58rem;color:#c0b8a8;font-weight:500;letter-spacing:.03em}
+
+/* Conflict day counter â iCal style */
+.day-counter{
+  position:fixed;top:1.2rem;right:1.2rem;z-index:100;
+  width:68px;height:72px;
+  background:#fff;border-radius:12px;
+  box-shadow:0 2px 10px rgba(0,0,0,.1),0 0 0 1px rgba(201,185,154,.25);
+  overflow:hidden;text-align:center;
+  font-family:'Inter',system-ui,sans-serif;
+  cursor:default;transition:transform .2s,box-shadow .2s;
+}
+.day-counter:hover{transform:scale(1.05);box-shadow:0 4px 16px rgba(0,0,0,.14),0 0 0 1px rgba(201,185,154,.35)}
+.day-counter-top{
+  background:linear-gradient(135deg,#c0392b,#a93226);
+  color:#fff;font-size:.48rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:.25rem 0 .2rem;line-height:1;
+}
+.day-counter-num{
+  font-size:1.8rem;font-weight:900;color:#2c2016;
+  line-height:1;padding:.2rem 0 .05rem;
+  font-variant-numeric:tabular-nums;
+}
+.day-counter-label{
+  font-size:.42rem;font-weight:600;color:#a89880;
+  letter-spacing:.05em;text-transform:uppercase;
+  padding-bottom:.25rem;
+}
+
+/* Info button */
+.info-btn{
+  position:fixed;top:1.2rem;left:1.2rem;z-index:100;
+  display:flex;align-items:center;gap:.4rem;
+  background:rgba(255,255,255,.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(201,185,154,.35);border-radius:8px;
+  padding:.45rem .75rem;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:.68rem;font-weight:600;color:#5a4f42;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);transition:all .2s;
+}
+.info-btn:hover{background:rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.info-btn svg{width:14px;height:14px;flex-shrink:0}
+
+/* Methodology overlay */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(30,25,20,.45);backdrop-filter:blur(4px);
+  justify-content:center;align-items:center;padding:1.5rem;
+}
+.overlay.open{display:flex}
+.overlay-card{
+  background:#faf8f4;border:1px solid rgba(201,185,154,.4);border-radius:16px;
+  max-width:640px;width:100%;max-height:85vh;overflow-y:auto;
+  padding:2rem 2.2rem;box-shadow:0 8px 40px rgba(0,0,0,.15);
+  position:relative;
+}
+.overlay-card h2{font-size:1rem;font-weight:800;color:#1a1714;margin-bottom:1rem;letter-spacing:-.02em}
+.overlay-card h3{font-size:.76rem;font-weight:700;color:#5a4f42;margin-top:1.2rem;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.04em}
+.overlay-card p{font-size:.73rem;color:#4a4238;line-height:1.65;margin-bottom:.5rem}
+.overlay-card .formula{
+  font-family:'SF Mono',Menlo,monospace;font-size:.65rem;
+  background:rgba(201,185,154,.15);border-radius:6px;
+  padding:.4rem .6rem;margin:.3rem 0 .5rem;color:#5a4f42;display:block;
+}
+.overlay-close{
+  position:absolute;top:1rem;right:1rem;
+  width:28px;height:28px;border-radius:50%;border:none;
+  background:rgba(201,185,154,.2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;color:#8a7e6e;transition:all .15s;
+}
+.overlay-close:hover{background:rgba(201,185,154,.4);color:#5a4f42}
+
+/* Chart ? tooltip */
+.chart-help{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border-radius:50%;
+  background:rgba(201,185,154,.2);color:#a89880;
+  font-size:.58rem;font-weight:700;cursor:pointer;
+  margin-left:.35rem;flex-shrink:0;transition:all .15s;position:relative;
+}
+.chart-help:hover{background:rgba(201,185,154,.45);color:#5a4f42}
+.chart-tooltip{
+  display:none;position:absolute;top:calc(100% + 6px);right:-8px;z-index:50;
+  background:#faf8f4;border:1px solid rgba(201,185,154,.4);border-radius:8px;
+  padding:.6rem .75rem;width:240px;
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
+  font-size:.62rem;font-weight:400;color:#4a4238;line-height:1.55;text-align:left;
+}
+.chart-tooltip strong{font-weight:700;color:#5a4f42}
+.chart-help:hover .chart-tooltip{display:block}
+</style>
+</head>
+<body>
+
+<!-- Conflict day counter top-right -->
+<div class="day-counter" id="day-counter">
+  <div class="day-counter-top">Conflict</div>
+  <div class="day-counter-num" id="day-counter-num"></div>
+  <div class="day-counter-label">days</div>
+</div>
+
+<!-- Info button top-left -->
+<div class="info-btn" onclick="document.getElementById('methOverlay').classList.add('open')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+  What we track &amp; how
+</div>
+
+<!-- Methodology overlay -->
+<div class="overlay" id="methOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="overlay-card">
+    <button class="overlay-close" onclick="document.getElementById('methOverlay').classList.remove('open')">&times;</button>
+    <h2>What we track &amp; how we do it</h2>
+    <p>Dubai Watch monitors 10 indicators to score whether conditions are safe to return to Dubai during the Iran-UAE conflict (active since Feb 28, 2026). Each indicator is scored 0-100, weighted, and combined into a single composite score.</p>
+
+    <h3>Scoring zones</h3>
+    <p><strong style="color:#c0392b">TAX TETRIS (0-32):</strong> Stay in Europe, manage your tax days carefully.<br>
+    <strong style="color:#b8860b">RECON MODE (33-65):</strong> Consider a short recon trip, keep European options open.<br>
+    <strong style="color:#1e8449">FIRST CLASS HOME (66-100):</strong> Conditions safe enough to return.</p>
+
+    <h3>Composite formula</h3>
+    <span class="formula">Composite = Sum(score_i x weight_i) / Sum(weight_i)&emsp;&mdash;&emsp;Total weight: 77</span>
+
+    <h3>1. Iranian launches (weight: 10)</h3>
+    <p><strong>Source:</strong> @modgovae on X (official UAE Ministry of Defence). We count ballistic missiles + UAVs reported in daily engagement tweets.<br><strong>Scoring:</strong> Binary &mdash; any launches > 0 = score 0, zero = score 100.</p>
+
+    <h3>2. UAE shelter alerts (weight: 10)</h3>
+    <p><strong>Source:</strong> @NCEMAUAE on X (National Emergency Crisis and Disaster Management Authority). We count tweets containing shelter/alert/warning keywords.<br><strong>Scoring:</strong> Binary &mdash; any alerts > 0 = score 0, zero = score 100.</p>
+
+    <h3>3. DXB flights (weight: 9)</h3>
+    <p><strong>Source:</strong> FlightRadar24 API (flight-summary/light endpoint). Counts departures + arrivals combined.<br><strong>Baseline:</strong> 1,200 movements/day (pre-conflict DXB average).<br><strong>Scoring:</strong> <span class="formula">score = min(100, current / baseline x 100)</span></p>
+
+    <h3>4. Brent crude (weight: 8)</h3>
+    <p><strong>Source:</strong> Yahoo Finance / CNBC.<br><strong>Baseline:</strong> $77.50/bbl (pre-conflict average).<br><strong>Scoring:</strong> Penalises deviation from baseline. <span class="formula">score = max(0, 100 - |deviation| x 200)</span></p>
+
+    <h3>5. VIX (weight: 5)</h3>
+    <p><strong>Source:</strong> Yahoo Finance.<br><strong>Baseline:</strong> 16.5 (pre-conflict average).<br><strong>Scoring:</strong> If VIX &le; baseline: 100. Otherwise: <span class="formula">score = max(0, 100 - (VIX - 16.5) / 16.5 x 200)</span></p>
+
+    <h3>6. UAE govt posture (weight: 8)</h3>
+    <p><strong>Source:</strong> @modgovae on X. Total daily tweet count = communiqu&eacute;s per day. Higher count = more active conflict communications.<br><strong>Scoring:</strong> <span class="formula">score = max(0, 100 - count x 10)</span></p>
+
+    <h3>7. Saudi govt posture (weight: 8)</h3>
+    <p><strong>Source:</strong> @modgovksa on X (Saudi Ministry of Defence). Same methodology as UAE posture.<br><strong>Scoring:</strong> <span class="formula">score = max(0, 100 - count x 10)</span></p>
+
+    <h3>8. French advisory (weight: 6)</h3>
+    <p><strong>Source:</strong> diplomatie.gouv.fr (French Ministry of Foreign Affairs).<br><strong>Scoring:</strong> Normal = 100, Vigilance renforc&eacute;e = 60, D&eacute;conseill&eacute; = 20, Formellement d&eacute;conseill&eacute; = 0.</p>
+
+    <h3>9. Embassy status (weight: 7)</h3>
+    <p><strong>Source:</strong> Manual check of G7 + P5 embassy websites.<br><strong>Scoring:</strong> All open = 100, Some closed = 40, All closed = 0.</p>
+
+    <h3>10. Civil normalcy (weight: 6)</h3>
+    <p><strong>Source:</strong> KHDA (Dubai schools authority) and government announcements.<br><strong>Scoring:</strong> Both open = 100, Schools or offices closed = 40, Both closed = 0.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="title">
+    <h1>Dubai<span>Watch</span></h1>
+    <p>Return-to-Dubai Decision Framework</p>
+  </div>
+  <div class="datestamp">Last updated: March 14, 2026</div>
+
+  <div class="gauge-outer">
+    <svg viewBox="0 0 600 350" id="gauge"></svg>
+  </div>
+
+  <div class="score-box">
+    <div class="score-num" id="score-num"></div>
+    <div class="score-of">/ 100</div>
+    <div class="verdict" id="verdict"></div>
+    <div class="verdict-sub" id="verdict-sub" style="display:none"></div>
+  </div>
+
+  <div class="zone-legend" id="zone-legend">
+    <div class="zone-legend-item zl-red" id="zl-red">
+      <div class="zl-header">
+        <span class="zl-badge">Tax Tetris</span>
+        <span class="zl-range">&mdash; score below 33</span>
+        <span class="zl-marker" id="zl-marker-red"></span>
+      </div>
+      <div class="zl-text">Time to play &lsquo;Tax Tetris&rsquo;&mdash;meticulously count those European days to avoid the IRS&rsquo;s evil twin dropping by for a &lsquo;friendly&rsquo; audit. Oh, and enjoy shelling out three times the cash for a nanny, while you shiver through another gray winter cursing the endless rain and paperwork avalanche.</div>
+    </div>
+    <div class="zone-legend-item zl-amber" id="zl-amber">
+      <div class="zl-header">
+        <span class="zl-badge">Recon Mode</span>
+        <span class="zl-range">&mdash; score 33 to 65</span>
+        <span class="zl-marker" id="zl-marker-amber"></span>
+      </div>
+      <div class="zl-text">Dip a toe back in: Book a recon trip to Dubai, but renew that European lease pronto&mdash;because nothing says &lsquo;expat savvy&rsquo; like playing hard to get with your own life choices, in case the desert drama reboots.</div>
+    </div>
+    <div class="zone-legend-item zl-green" id="zl-green">
+      <div class="zl-header">
+        <span class="zl-badge">First Class Home</span>
+        <span class="zl-range">&mdash; score 66 or above</span>
+        <span class="zl-marker" id="zl-marker-green"></span>
+      </div>
+      <div class="zl-text">Splurge on first-class home&mdash;zero taxes mean you fly royal, not tax-poor. Dash back before crypto bros turn your villa into a meme coin headquarters. Ditch the tax advisor retainer.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="charts-section">
+    <h2>Conflict Timeline &mdash; Feb 28 to Mar 14, 2026</h2>
+    <div class="charts-grid" id="charts-grid"></div>
+  </div>
+
+  <div class="breakdown" id="breakdown"></div>
+
+  <div class="suggest-box" id="suggest-box">
+    <div class="suggest-label">Drop any suggestion you may want to see</div>
+    <textarea class="suggest-input" id="suggest-input" placeholder="New indicator idea, better wording, feature request..." rows="3"></textarea>
+    <button class="suggest-btn" id="suggest-btn" onclick="submitSuggestion()">Send</button>
+    <div class="suggest-thanks" id="suggest-thanks">Thanks! We&rsquo;ll take a look.</div>
+  </div>
+
+  <div class="footer">Dubai Watch v1.0 &middot; Confidential &middot; Weighted indicator model &middot; Auto-updates every 12h (00:00 &amp; 12:00 Dubai) &middot; Sources: X API, FR24, Yahoo Finance, KHDA, MFA France</div>
+</div>
+
+<script>
+/*
+  ============================================================
+  REAL DATA â March 14, 2026
+  DXB baseline: ~1,200 movements/day (dep+arr) pre-conflict
+  (DXB handles 1,100-1,275 daily flights departures+arrivals)
+  FR24 API returns a subset â we extrapolate to full count.
+  ============================================================
+*/
+var DATES = ['Feb 28','Mar 1','Mar 2','Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8','Mar 9','Mar 10','Mar 11','Mar 12','Mar 13','Mar 14'];
+
+var INDICATORS = {
+  iranian_launches: {
+    value: 42, baseline: 0, weight: 37,
+    name: "Iranian launches", unit: "\ud83d\ude80/day",
+    source: "@modgovae (X API)",
+    history: [0, 165, 163, 135, 132, 131, 118, 134, 129, 29, 34, 52, 36, 34, 42],
+    chartBaseline: 0, color: "#c0392b", baselineLabel: "Pre-conflict: 0",
+    help: "<strong>Source:</strong> @modgovae (UAE Ministry of Defence) via X API. Counts ballistic missiles + UAVs from daily engagement tweets.<br><strong>Scoring:</strong> Binary \u2014 any value > 0 = 0, zero = 100.<br><strong>Weight:</strong> 37/83"
+  },
+  shelter_alerts: {
+    value: 0, baseline: 0, weight: 10,
+    name: "UAE shelter alerts", unit: "alerts/day",
+    source: "@NCEMAUAE (X API)",
+    history: [4, 0, 1, 0, 0, 6, 0, 2, 1, 3, 2, 3, 2, 2, 0],
+    chartBaseline: 0, color: "#c0392b", baselineLabel: "Pre-conflict: 0",
+    help: "<strong>Source:</strong> @NCEMAUAE (National Emergency Authority) via X API. Counts tweets with shelter/alert/warning keywords.<br><strong>Scoring:</strong> Binary \u2014 any value > 0 = 0, zero = 100.<br><strong>Weight:</strong> 10/83"
+  },
+  dxb_flights: {
+    value: 206, baseline: 1200, weight: 9,
+    name: "DXB flights (dep+arr)", unit: "\u2708\ufe0f/day",
+    history: [0, 0, 24, 24, 56, 84, 110, 124, 140, 156, 164, 176, 190, 206, 206],
+    chartBaseline: 1200, color: "#2471a3", baselineLabel: "Pre-conflict: 1,200/day",
+    help: "<strong>Source:</strong> FlightRadar24 API. Departures + arrivals combined.<br><strong>Baseline:</strong> 1,200 \u2708\ufe0f/day (pre-conflict average).<br><strong>Scoring:</strong> score = current / baseline \u00d7 100 (capped at 100).<br><strong>Weight:</strong> 9/83"
+  },
+  brent_crude: {
+    value: 103.14, baseline: 77.5, weight: 8,
+    name: "Brent crude", unit: "$/bbl",
+    history: [82.4, 88.1, 92.6, 96.3, 98.7, 100.2, 103.4, 105.8, 108.2, 106.1, 104.5, 103.2, 101.8, 103.1, 103.1],
+    chartBaseline: 77.5, color: "#b8860b", baselineLabel: "Pre-conflict: $77.50",
+    help: "<strong>Source:</strong> Yahoo Finance / CNBC.<br><strong>Baseline:</strong> $77.50/bbl (pre-conflict avg).<br><strong>Scoring:</strong> Penalises deviation: score = 100 \u2212 |% deviation| \u00d7 200. Oil spiking = conflict premium = bad.<br><strong>Weight:</strong> 8/83"
+  },
+  vix: {
+    value: 27.19, baseline: 16.5, weight: 5,
+    name: "VIX", unit: "index",
+    history: [22.4, 28.6, 32.1, 35.4, 33.2, 30.1, 28.8, 27.3, 26.1, 28.4, 29.2, 27.5, 26.4, 27.2, 27.2],
+    chartBaseline: 16.5, color: "#b8860b", baselineLabel: "Pre-conflict: 16.5",
+    help: "<strong>Source:</strong> Yahoo Finance (CBOE VIX).<br><strong>Baseline:</strong> 16.5 (pre-conflict avg).<br><strong>Scoring:</strong> Linear scale: 16.5 = 100, COVID peak (82) = 0. Higher VIX = more fear.<br><strong>Weight:</strong> 5/83"
+  },
+  govt_posture_uae: {
+    value: 3, baseline: 0, weight: 8,
+    name: "UAE govt posture", unit: "comm/day",
+    source: "@modgovae (X API)",
+    history: [5, 7, 7, 22, 3, 4, 3, 9, 14, 7, 5, 4, 9, 4, 3],
+    chartBaseline: 0, color: "#b8860b", baselineLabel: "Pre-conflict: 0",
+    help: "<strong>Source:</strong> @modgovae tweet count per day. More communiqu\u00e9s = heightened military activity.<br><strong>Scoring:</strong> score = 100 \u2212 count \u00d7 10 (min 0).<br><strong>Weight:</strong> 8/83"
+  },
+  french_advisory: {
+    value: "formellement_deconseille", baseline: "normal", weight: 6,
+    name: "French advisory", unit: "level",
+    history: [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    historyLabels: {0:"Normal",1:"Vigilance",2:"Deconseille",3:"Form. dec."},
+    chartBaseline: 0, color: "#c0392b", baselineLabel: "Pre-conflict: Normal",
+    help: "<strong>Source:</strong> diplomatie.gouv.fr (French MFA).<br><strong>Scoring:</strong> Normal = 100, Vigilance renforc\u00e9e = 60, D\u00e9conseill\u00e9 = 20, Formellement d\u00e9conseill\u00e9 = 0.<br><strong>Weight:</strong> 6/83"
+  },
+};
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+function computeScore(id, d) {
+  var v = d.value;
+  if (id === "iranian_launches")   return v > 0 ? 0 : 100;
+  if (id === "shelter_alerts")     return v > 0 ? 0 : 100;
+  if (id === "dxb_flights")        return Math.min(100, (v / d.baseline) * 100);
+  if (id === "brent_crude") {
+    var dev = Math.abs(v - d.baseline) / d.baseline;
+    return Math.max(0, 100 - dev * 200);
+  }
+  if (id === "vix") {
+    var covidPeak = 82;
+    if (v <= d.baseline) return 100;
+    return Math.max(0, 100 * (covidPeak - v) / (covidPeak - d.baseline));
+  }
+  if (id === "govt_posture_uae")
+    return Math.max(0, 100 - v * 10);
+  if (id === "french_advisory") {
+    var m = { normal: 100, vigilance_renforcee: 60, deconseille: 20, formellement_deconseille: 0 };
+    return m[v] !== undefined ? m[v] : 50;
+  }
+  return 50;
+}
+
+var weightedSum = 0, totalWeight = 0, rows = [];
+for (var id in INDICATORS) {
+  var d = INDICATORS[id];
+  var sc = Math.round(computeScore(id, d) * 10) / 10;
+  var ws = Math.round(sc * d.weight * 10) / 10;
+  weightedSum += ws;
+  totalWeight += d.weight;
+  rows.push({ id: id, name: d.name, value: d.value, unit: d.unit, score: sc, weight: d.weight, weighted: ws, baseline: d.baseline });
+}
+var COMPOSITE = Math.round(weightedSum / totalWeight * 10) / 10;
+
+/* ============================================================
+   BURJ KHALIFA NEEDLE
+   ============================================================ */
+function burjKhalifaPath(tipX, tipY, totalH) {
+  var H = totalH;
+  var pts = [
+    [0.3,0],[0.6,.01],[0.8,.019],[1.2,.14],[1.5,.149],[1.9,.159],
+    [2.1,.168],[2.3,.178],[2.4,.189],[2.5,.198],[2.5,.208],[2.5,.218],
+    [2.7,.236],[2.8,.25],[3,.261],[3.1,.271],[3.3,.281],[3.2,.291],
+    [3.2,.3],[3.3,.31],[3.3,.32],[3.3,.329],[3.5,.339],[3.6,.345],
+    [3.6,.357],[3.8,.369],[4,.381],[4.3,.394],[4.5,.406],[4.8,.418],
+    [4.9,.43],[5.1,.444],[5.1,.453],[5.1,.463],[5.1,.473],[5.1,.482],
+    [5.1,.492],[5.1,.502],[5.1,.512],[5.1,.522],[5.1,.531],[5.4,.541],
+    [5.8,.551],[6.2,.56],[6.6,.571],[7,.58],[7.2,.59],[7.2,.6],
+    [7.2,.609],[7.3,.619],[7.3,.628],[7.3,.639],[7.4,.649],[7.4,.658],
+    [7.5,.668],[7.5,.678],[7.5,.687],[7.5,.697],[7.5,.706],[7.5,.717],
+    [7.6,.727],[7.9,.736],[8.4,.746],[8.9,.756],[9.5,.765],[10.1,.775],
+    [10.6,.785],[11.3,.8],[12.1,.82],[13.1,.84],[14.3,.86],[15.5,.88],
+    [16.7,.9],[17.9,.92],[18.9,.94],[19.7,.96],[20.1,.98],[20.4,1]
+  ];
+  var d = '';
+  for (var i = 0; i < pts.length; i++) {
+    d += (i===0?'M':'L')+(tipX+pts[i][0]).toFixed(1)+','+(tipY+pts[i][1]*H).toFixed(1)+' ';
+  }
+  d += 'L'+(tipX-pts[pts.length-1][0]).toFixed(1)+','+(tipY+H).toFixed(1)+' ';
+  for (var i = pts.length-1; i >= 0; i--) {
+    d += 'L'+(tipX-pts[i][0]).toFixed(1)+','+(tipY+pts[i][1]*H).toFixed(1)+' ';
+  }
+  return d+'Z';
+}
+
+/* ============================================================
+   GAUGE â premium light design with correct curved text
+   ============================================================ */
+function drawGauge(score) {
+  var svg = document.getElementById('gauge');
+  var cx = 300, cy = 300, r = 230;
+  var h = '';
+
+  function arcPath(cx,cy,r,startDeg,endDeg,sweep){
+    if(sweep===undefined) sweep=1;
+    var sr=startDeg*Math.PI/180, er=endDeg*Math.PI/180;
+    var sx=cx+Math.cos(sr)*r, sy=cy-Math.sin(sr)*r;
+    var ex=cx+Math.cos(er)*r, ey=cy-Math.sin(er)*r;
+    var large=Math.abs(startDeg-endDeg)>180?1:0;
+    return 'M '+sx.toFixed(2)+' '+sy.toFixed(2)+' A '+r+' '+r+' 0 '+large+' '+sweep+' '+ex.toFixed(2)+' '+ey.toFixed(2);
+  }
+
+  h += '<defs>';
+  /* Warm gradients for light theme */
+  h += '<linearGradient id="gRed" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e74c3c"/><stop offset="100%" stop-color="#c0392b"/></linearGradient>';
+  h += '<linearGradient id="gAmber" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f39c12"/><stop offset="100%" stop-color="#d4a017"/></linearGradient>';
+  h += '<linearGradient id="gGreen" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#27ae60"/><stop offset="100%" stop-color="#1e8449"/></linearGradient>';
+  h += '<linearGradient id="burj" x1="0.3" y1="0" x2="0.7" y2="1">';
+  h += '<stop offset="0%" stop-color="#5a4f42"/><stop offset="30%" stop-color="#6b5f50"/>';
+  h += '<stop offset="60%" stop-color="#8a7e6e"/><stop offset="100%" stop-color="#a89880"/>';
+  h += '</linearGradient>';
+  h += '<filter id="bshadow"><feDropShadow dx="0.5" dy="1.5" stdDeviation="2.5" flood-color="rgba(0,0,0,.2)"/></filter>';
+
+  h += '</defs>';
+
+  /* Subtle outer shadow ring */
+  h += '<path d="'+arcPath(cx,cy,r+2,180,0)+'" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="52" stroke-linecap="round"/>';
+
+  /* Background track */
+  h += '<path d="'+arcPath(cx,cy,r,180,0)+'" fill="none" stroke="#ddd5c8" stroke-width="44" stroke-linecap="round"/>';
+
+  /* Colored zones */
+  h += '<path d="'+arcPath(cx,cy,r,180,120)+'" fill="none" stroke="url(#gRed)" stroke-width="38" opacity=".85"/>';
+  h += '<path d="'+arcPath(cx,cy,r,120,60)+'" fill="none" stroke="url(#gAmber)" stroke-width="38" opacity=".85"/>';
+  h += '<path d="'+arcPath(cx,cy,r,60,0)+'" fill="none" stroke="url(#gGreen)" stroke-width="38" opacity=".85"/>';
+
+  /* Inner accent lines */
+  h += '<path d="'+arcPath(cx,cy,r-10,180,120)+'" fill="none" stroke="#c0392b" stroke-width="1" opacity=".12"/>';
+  h += '<path d="'+arcPath(cx,cy,r-10,120,60)+'" fill="none" stroke="#d4a017" stroke-width="1" opacity=".12"/>';
+  h += '<path d="'+arcPath(cx,cy,r-10,60,0)+'" fill="none" stroke="#1e8449" stroke-width="1" opacity=".12"/>';
+
+  /* Curved zone labels â character by character along the arc */
+  function curvedText(text, startA, endA, radius, fill, opacity) {
+    var out = '';
+    var len = text.length;
+    for (var ci = 0; ci < len; ci++) {
+      var t = (ci + 0.5) / len;
+      var angle = startA + (endA - startA) * t;
+      var rad = angle * Math.PI / 180;
+      var px = cx + Math.cos(rad) * radius;
+      var py = cy - Math.sin(rad) * radius;
+      var rot = 90 - angle;
+      out += '<text x="'+px.toFixed(1)+'" y="'+py.toFixed(1)+'" transform="rotate('+rot.toFixed(1)+','+px.toFixed(1)+','+py.toFixed(1)+')" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-weight="800" font-size="9" letter-spacing=".06em" fill="'+fill+'" opacity="'+opacity+'">'+text[ci]+'</text>';
+    }
+    return out;
+  }
+  var labelR = r - 34;
+  /* Angles go from LEFT to RIGHT visually: high angle â low angle */
+  h += curvedText('TAX  TETRIS', 168, 132, labelR, '#c0392b', '.5');
+  h += curvedText('RECON  MODE', 108, 72, labelR, '#b8860b', '.5');
+  h += curvedText('FIRST CLASS HOME', 54, 6, labelR, '#1e8449', '.45');
+
+  /* Tick marks */
+  for(var i=0;i<=20;i++){
+    var a=(180-i*9)*Math.PI/180, major=(i%5===0);
+    var r1=r+24, r2=r+(major?38:31);
+    h+='<line x1="'+(cx+Math.cos(a)*r1)+'" y1="'+(cy-Math.sin(a)*r1)+'" x2="'+(cx+Math.cos(a)*r2)+'" y2="'+(cy-Math.sin(a)*r2)+'" stroke="'+(major?'#a89880':'#cdc3b3')+'" stroke-width="'+(major?1.5:0.8)+'" stroke-linecap="round"/>';
+  }
+  var nums=[0,25,50,75,100];
+  for(var i=0;i<nums.length;i++){
+    var a=(180-(nums[i]/100)*180)*Math.PI/180;
+    h+='<text x="'+(cx+Math.cos(a)*(r+50))+'" y="'+(cy-Math.sin(a)*(r+50)+3.5)+'" text-anchor="middle" fill="#a89880" font-size="10" font-family="Inter,sans-serif" font-weight="700">'+nums[i]+'</text>';
+  }
+
+  /* Needle (Burj Khalifa) */
+  var needleDeg = 180 - (score/100)*180;
+  var rotDeg = -(needleDeg - 90);
+  var burjH = 190;
+  var burjTipY = cy - burjH;
+
+  h += '<g transform="rotate('+rotDeg.toFixed(2)+','+cx+','+cy+')" filter="url(#bshadow)">';
+  h += '<path d="'+burjKhalifaPath(cx, burjTipY, burjH)+'" fill="url(#burj)" stroke="rgba(90,79,66,.2)" stroke-width=".5"/>';
+  /* Windows */
+  for(var row=0;row<55;row++){var wy=burjTipY+burjH*(0.20+row*0.013);if(wy>burjTipY+burjH*0.95)break;var frac=(wy-burjTipY)/burjH;var halfW=0.3+frac*18;var numW=Math.max(1,Math.floor(halfW/2));for(var col=-numW;col<=numW;col++){if(Math.random()>0.45)continue;var wx=cx+col*1.8;if(Math.abs(wx-cx)>halfW)continue;h+='<rect x="'+(wx-0.3).toFixed(1)+'" y="'+wy.toFixed(1)+'" width="0.6" height="0.8" rx=".15" fill="rgba(255,255,255,.15)"/>';}}
+  h+='<circle cx="'+cx+'" cy="'+burjTipY+'" r="1" fill="#c0392b" opacity=".5"/>';
+  h += '</g>';
+
+  /* Center cap */
+  h += '<circle cx="'+cx+'" cy="'+cy+'" r="16" fill="#f0ebe3" stroke="#cdc3b3" stroke-width="1.5"/>';
+  h += '<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="#a89880" stroke="#8a7e6e" stroke-width="1"/>';
+
+  svg.innerHTML = h;
+
+  /* Score + verdict */
+  var scoreEl = document.getElementById('score-num');
+  var verdictEl = document.getElementById('verdict');
+  var subEl = document.getElementById('verdict-sub');
+  scoreEl.textContent = score.toFixed(1);
+
+  var activeZone;
+  if (score >= 66) {
+    scoreEl.style.color = '#1e8449';
+    verdictEl.style.color = '#1e8449';
+    verdictEl.textContent = 'FIRST CLASS HOME';
+    activeZone = 'green';
+  } else if (score >= 33) {
+    scoreEl.style.color = '#b8860b';
+    verdictEl.style.color = '#b8860b';
+    verdictEl.textContent = 'RECON MODE';
+    activeZone = 'amber';
+  } else {
+    scoreEl.style.color = '#c0392b';
+    verdictEl.style.color = '#c0392b';
+    verdictEl.textContent = 'TAX TETRIS';
+    activeZone = 'red';
+  }
+
+  /* Highlight active zone in legend, mute others */
+  var zones = ['red', 'amber', 'green'];
+  for (var zi = 0; zi < zones.length; zi++) {
+    var el = document.getElementById('zl-' + zones[zi]);
+    var marker = document.getElementById('zl-marker-' + zones[zi]);
+    if (el) {
+      if (zones[zi] === activeZone) {
+        el.classList.add('zl-active');
+        el.classList.remove('zl-muted');
+        if (marker) marker.textContent = '\u25c0 you are here';
+      } else {
+        el.classList.remove('zl-active');
+        el.classList.add('zl-muted');
+        if (marker) marker.textContent = '';
+      }
+    }
+  }
+}
+
+/* ============================================================
+   SPARKLINE CHARTS with baseline + % comparison
+   ============================================================ */
+function buildCharts() {
+  var grid = document.getElementById('charts-grid');
+  var html = '';
+
+  for (var id in INDICATORS) {
+    var ind = INDICATORS[id];
+    var hist = ind.history;
+    var n = hist.length;
+
+    var W = 300, H = 85, padL = 0, padR = 0, padT = 4, padB = 16;
+    var cW = W - padL - padR, cH = H - padT - padB;
+
+    var allVals = hist.concat([ind.chartBaseline]);
+    var yMin = Math.min.apply(null, allVals);
+    var yMax = Math.max.apply(null, allVals);
+    if (yMin === yMax) { yMin -= 1; yMax += 1; }
+    var yPad = (yMax - yMin) * 0.15;
+    yMin = Math.max(0, yMin - yPad);
+    yMax = yMax + yPad;
+
+    function xPos(i) { return padL + (i / (n - 1)) * cW; }
+    function yPos(v) { return padT + cH - ((v - yMin) / (yMax - yMin)) * cH; }
+
+    var linePath = '';
+    for (var i = 0; i < n; i++) {
+      linePath += (i === 0 ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(hist[i]).toFixed(1);
+    }
+    var areaPath = linePath + ' L' + xPos(n-1).toFixed(1) + ',' + (padT + cH).toFixed(1) + ' L' + xPos(0).toFixed(1) + ',' + (padT + cH).toFixed(1) + ' Z';
+
+    var blY = yPos(ind.chartBaseline);
+
+    /* Current value display */
+    var valStr;
+    var isInteractive = (id === 'iranian_launches' || id === 'dxb_flights');
+    if (id === 'iranian_launches') {
+      var lastFullDay = hist[hist.length - 1];
+      valStr = lastFullDay + ' \ud83d\ude80 on ' + DATES[hist.length - 1];
+    } else if (id === 'dxb_flights') {
+      var lastFullDay = hist[hist.length - 1];
+      valStr = lastFullDay + ' \u2708\ufe0f on ' + DATES[hist.length - 1];
+    } else if (typeof ind.value === 'number') {
+      valStr = (ind.value % 1 === 0 ? ind.value : ind.value.toFixed(1)) + ' ' + ind.unit;
+    } else {
+      valStr = ind.value.replace(/_/g, ' ');
+    }
+
+    /* % of baseline */
+    var pctStr = '';
+    if (typeof ind.value === 'number' && ind.baseline > 0) {
+      var pctDiff = Math.round(((ind.value - ind.baseline) / ind.baseline) * 100);
+      pctStr = (pctDiff >= 0 ? '+' : '') + pctDiff + '% vs baseline';
+    } else if (typeof ind.value === 'number' && ind.baseline === 0 && ind.value > 0) {
+      pctStr = '\u26a0 active (baseline: 0)';
+    } else if (typeof ind.value !== 'number') {
+      pctStr = '';
+    }
+
+    var sc = computeScore(id, ind);
+    sc = Math.round(sc * 10) / 10;
+    var scCls = sc >= 80 ? 'sc-high' : (sc >= 50 ? 'sc-mid' : 'sc-low');
+
+    var gid = 'cg_' + id;
+
+    var svg = '<svg class="chart-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
+    svg += '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1">';
+    svg += '<stop offset="0%" stop-color="'+ind.color+'" stop-opacity=".18"/>';
+    svg += '<stop offset="100%" stop-color="'+ind.color+'" stop-opacity=".02"/>';
+    svg += '</linearGradient></defs>';
+
+    /* Baseline dashed line + label */
+    svg += '<line x1="'+padL+'" y1="'+blY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+blY.toFixed(1)+'" stroke="#a89880" stroke-width=".7" stroke-dasharray="4,3" opacity=".6"/>';
+    /* Baseline label on the right */
+    var blLabel = ind.baselineLabel || ('baseline: ' + ind.chartBaseline);
+    svg += '<text x="'+(W-padR-2)+'" y="'+(Math.max(padT+8, blY-3)).toFixed(1)+'" text-anchor="end" fill="#a89880" font-size="6.5" font-family="Inter,sans-serif" font-weight="600" opacity=".7">'+blLabel+'</text>';
+
+    /* Area + line */
+    svg += '<path d="'+areaPath+'" fill="url(#'+gid+')"/>';
+    svg += '<path d="'+linePath+'" fill="none" stroke="'+ind.color+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>';
+
+    /* End dot with pulse */
+    svg += '<circle cx="'+xPos(n-1).toFixed(1)+'" cy="'+yPos(hist[n-1]).toFixed(1)+'" r="3" fill="'+ind.color+'" opacity=".15"/>';
+    svg += '<circle cx="'+xPos(n-1).toFixed(1)+'" cy="'+yPos(hist[n-1]).toFixed(1)+'" r="2" fill="'+ind.color+'"/>';
+
+    /* X-axis date labels */
+    var labelIdx = [0, 7, n-1];
+    for (var li = 0; li < labelIdx.length; li++) {
+      var idx = labelIdx[li];
+      svg += '<text x="'+xPos(idx).toFixed(1)+'" y="'+(H-2)+'" text-anchor="'+(idx===0?'start':(idx===n-1?'end':'middle'))+'" fill="#a89880" font-size="7" font-family="Inter,sans-serif" font-weight="500">'+DATES[idx]+'</text>';
+    }
+
+    svg += '</svg>';
+
+    html += '<div class="chart-card" data-indicator="'+id+'">';
+    html += '<div class="chart-header">';
+    html += '<span class="chart-title">'+ind.name+'<span class="chart-help">?<span class="chart-tooltip">'+ind.help+'</span></span></span>';
+    html += '<span class="chart-value" style="color:'+ind.color+'">'+valStr+'</span>';
+    html += '</div>';
+    if (id === 'iranian_launches') {
+      var cumTotal = hist.reduce(function(a, b) { return a + b; }, 0);
+      html += '<div class="chart-cumul">' + cumTotal.toLocaleString() + ' \ud83d\ude80 total since Feb 28</div>';
+    } else if (id === 'dxb_flights') {
+      var cumTotal = hist.reduce(function(a, b) { return a + b; }, 0);
+      html += '<div class="chart-cumul">' + cumTotal.toLocaleString() + ' \u2708\ufe0f total since Feb 28</div>';
+    }
+    html += '<div class="chart-meta">';
+    html += '<span class="chart-pct '+scCls+'">Score: '+sc.toFixed(0)+'/100</span>';
+    html += '<span>'+pctStr+'</span>';
+    html += '</div>';
+    if (isInteractive) {
+      html += '<div class="chart-hover-zone" data-id="'+id+'" data-w="'+W+'" data-h="'+H+'" data-padl="'+padL+'" data-padr="'+padR+'" data-padt="'+padT+'" data-padb="'+padB+'" data-ymin="'+yMin.toFixed(4)+'" data-ymax="'+yMax.toFixed(4)+'" data-hist="'+hist.join(',')+'" data-color="'+ind.color+'" data-unit="'+ind.unit+'">';
+      html += svg;
+      html += '<div class="chart-tooltip-line"></div>';
+      html += '<div class="chart-tooltip-dot"></div>';
+      html += '<div class="chart-tooltip-box"><div class="tt-date"></div><div class="tt-val"></div></div>';
+      html += '</div>';
+    } else {
+      html += svg;
+    }
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
+  initChartHover();
+}
+
+/* ============================================================
+   INTERACTIVE HOVER TOOLTIP for projectile chart
+   ============================================================ */
+function initChartHover() {
+  var zones = document.querySelectorAll('.chart-hover-zone');
+  for (var z = 0; z < zones.length; z++) {
+    (function(zone) {
+      var svgEl = zone.querySelector('.chart-svg');
+      var line = zone.querySelector('.chart-tooltip-line');
+      var dot = zone.querySelector('.chart-tooltip-dot');
+      var box = zone.querySelector('.chart-tooltip-box');
+      var ttDate = box.querySelector('.tt-date');
+      var ttVal = box.querySelector('.tt-val');
+
+      var hist = zone.dataset.hist.split(',').map(Number);
+      var W = +zone.dataset.w;
+      var H = +zone.dataset.h;
+      var padL = +zone.dataset.padl;
+      var padR = +zone.dataset.padr;
+      var padT = +zone.dataset.padt;
+      var padB = +zone.dataset.padb;
+      var yMin = +zone.dataset.ymin;
+      var yMax = +zone.dataset.ymax;
+      var color = zone.dataset.color;
+      var unit = zone.dataset.unit;
+      var n = hist.length;
+      var cW = W - padL - padR;
+      var cH = H - padT - padB;
+
+      function show() { line.style.display = dot.style.display = box.style.display = 'block'; }
+      function hide() { line.style.display = dot.style.display = box.style.display = 'none'; }
+
+      zone.addEventListener('mousemove', function(e) {
+        var rect = svgEl.getBoundingClientRect();
+        var relX = e.clientX - rect.left;
+        var pct = relX / rect.width;
+        var idx = Math.round(pct * (n - 1));
+        idx = Math.max(0, Math.min(n - 1, idx));
+
+        var xPct = (padL + (idx / (n - 1)) * cW) / W * 100;
+        var yPct = (padT + cH - ((hist[idx] - yMin) / (yMax - yMin)) * cH) / H * 100;
+
+        show();
+        line.style.left = xPct + '%';
+        dot.style.left = xPct + '%';
+        dot.style.top = yPct + '%';
+        dot.style.background = color;
+
+        ttDate.textContent = DATES[idx];
+        ttVal.innerHTML = '<span style="color:'+color+'">' + hist[idx] + '</span> ' + unit;
+
+        /* Position tooltip â flip if too far right */
+        box.style.top = Math.max(0, yPct - 38) + '%';
+        if (xPct > 75) {
+          box.style.left = (xPct - 8) + '%';
+        } else if (xPct < 25) {
+          box.style.left = (xPct + 8) + '%';
+        } else {
+          box.style.left = xPct + '%';
+        }
+      });
+
+      zone.addEventListener('mouseleave', hide);
+    })(zones[z]);
+  }
+}
+
+/* ============================================================
+   BREAKDOWN TABLE
+   ============================================================ */
+function renderBreakdown() {
+  var el = document.getElementById('breakdown');
+  var t = '<table>';
+  t += '<thead><tr><th>#</th><th>Indicator</th><th>Current</th><th>Score</th><th>Wt</th></tr></thead>';
+  t += '<tbody>';
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var cls = r.score >= 80 ? 'sc-high' : (r.score >= 50 ? 'sc-mid' : 'sc-low');
+    var valStr;
+    if (typeof r.value === 'number') {
+      valStr = (r.value % 1 === 0 ? r.value : r.value.toFixed(1)) + ' ' + r.unit;
+    } else {
+      valStr = r.value.replace(/_/g, ' ');
+    }
+    t += '<tr>';
+    t += '<td style="color:#a89880">' + (i+1) + '</td>';
+    t += '<td>' + r.name + '</td>';
+    t += '<td>' + valStr + '</td>';
+    t += '<td class="score-cell ' + cls + '">' + r.score.toFixed(1) + '</td>';
+    t += '<td style="color:#a89880">' + r.weight + '</td>';
+    t += '</tr>';
+  }
+  t += '</tbody>';
+  t += '<tfoot><tr>';
+  t += '<td></td><td>COMPOSITE SCORE</td><td></td>';
+  var compCls = COMPOSITE >= 80 ? 'sc-high' : (COMPOSITE >= 50 ? 'sc-mid' : 'sc-low');
+  t += '<td class="score-cell ' + compCls + '">' + COMPOSITE.toFixed(1) + '</td>';
+  t += '<td style="color:#a89880">' + totalWeight + '</td>';
+  t += '</tr></tfoot></table>';
+  el.innerHTML = t;
+}
+
+/* ============================================================
+   INITIAL RENDER (hardcoded fallback)
+   ============================================================ */
+drawGauge(COMPOSITE);
+buildCharts();
+renderBreakdown();
+
+/* ============================================================
+   LIVE DATA LOADER â fetches latest.json from backend
+   Tries relative path (for VPS) and data/ subfolder.
+   If fetch succeeds, overwrites indicators and re-renders.
+   If fetch fails, the hardcoded data above stays visible.
+   ============================================================ */
+(function loadLiveData() {
+  var paths = ['data/latest.json', 'static/latest.json', 'latest.json'];
+  var tried = 0;
+
+  function tryNext() {
+    if (tried >= paths.length) return; // all failed, keep hardcoded
+    var url = paths[tried] + '?t=' + Date.now(); // cache-bust
+    tried++;
+
+    fetch(url).then(function(r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function(data) {
+      applyLiveData(data);
+    }).catch(function() {
+      tryNext();
+    });
+  }
+
+  function applyLiveData(data) {
+    if (!data || !data.indicators) return;
+
+    // Update date labels
+    if (data.date_labels && data.date_labels.length > 0) {
+      DATES = data.date_labels;
+    }
+
+    // Update datestamp
+    if (data.updated_at) {
+      var d = new Date(data.updated_at);
+      var opts = { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Asia/Dubai' };
+      document.querySelector('.datestamp').textContent = 'Last updated: ' + d.toLocaleString('en-US', opts) + ' (Dubai)';
+    }
+
+    // Merge live values into INDICATORS
+    var ind = data.indicators;
+    for (var id in ind) {
+      if (!INDICATORS[id]) continue;
+      var live = ind[id];
+
+      if (live.value !== null && live.value !== undefined) {
+        INDICATORS[id].value = live.value;
+      }
+      if (live.history && live.history.length > 0) {
+        INDICATORS[id].history = live.history;
+      }
+    }
+
+    // Recompute scores
+    weightedSum = 0; totalWeight = 0; rows = [];
+    for (var id in INDICATORS) {
+      var d = INDICATORS[id];
+      var sc = Math.round(computeScore(id, d) * 10) / 10;
+      var ws = Math.round(sc * d.weight * 10) / 10;
+      weightedSum += ws;
+      totalWeight += d.weight;
+      rows.push({ id: id, name: d.name, value: d.value, unit: d.unit, score: sc, weight: d.weight, weighted: ws, baseline: d.baseline });
+    }
+    COMPOSITE = Math.round(weightedSum / totalWeight * 10) / 10;
+
+    // Re-render everything
+    drawGauge(COMPOSITE);
+    buildCharts();
+    renderBreakdown();
+
+    console.log('[Dubai Watch] Live data loaded â Composite: ' + COMPOSITE);
+  }
+
+  tryNext();
+})();
+
+/* ============================================================
+   ANALYTICS â tracking pixel
+   Pings /t.gif on every page load. No cookies, no JS tracking libs.
+   Only works when served from the FastAPI backend (Hetzner VPS).
+   Silently fails when opened as a local file.
+   ============================================================ */
+(function() {
+  try {
+    var img = new Image();
+    img.src = '/t.gif?r=' + encodeURIComponent(document.referrer) + '&t=' + Date.now();
+  } catch(e) {}
+})();
+
+/* ============================================================
+   SUGGESTION BOX
+   Posts to /api/suggestions when on VPS, shows thank-you locally
+   ============================================================ */
+/* ============================================================
+   CONFLICT DAY COUNTER
+   Counts days since Feb 28, 2026 (Day 1 of Iranian strikes)
+   ============================================================ */
+(function() {
+  var start = new Date(2026, 1, 28); // Feb 28, 2026 (month is 0-indexed)
+  var now = new Date();
+  var diff = Math.floor((now - start) / (1000 * 60 * 60 * 24)) + 1; // Day 1 = Feb 28
+  var el = document.getElementById('day-counter-num');
+  if (el) el.textContent = diff;
+})();
+
+function submitSuggestion() {
+  var input = document.getElementById('suggest-input');
+  var btn = document.getElementById('suggest-btn');
+  var thanks = document.getElementById('suggest-thanks');
+  var text = input.value.trim();
+  if (!text) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  /* Try posting to backend; if it fails (local file), just show thanks */
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/suggestions', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) showThanks();
+    };
+    xhr.onerror = function() { showThanks(); };
+    xhr.send(JSON.stringify({ text: text, ts: new Date().toISOString() }));
+  } catch(e) { showThanks(); }
+
+  function showThanks() {
+    input.value = '';
+    btn.textContent = 'Send';
+    btn.disabled = false;
+    thanks.style.display = 'block';
+    setTimeout(function() { thanks.style.display = 'none'; }, 4000);
+  }
+}
+</script>
+</body>
+</html>
